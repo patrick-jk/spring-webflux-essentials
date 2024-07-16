@@ -19,6 +19,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.List;
+
 @ExtendWith(SpringExtension.class)
 class AnimeServiceTest {
     @InjectMocks
@@ -44,6 +46,10 @@ class AnimeServiceTest {
 
         BDDMockito.when(animeRepositoryMock.save(AnimeCreator.createAnimeToBeSaved()))
                 .thenReturn(Mono.just(anime));
+
+        BDDMockito.when(animeRepositoryMock
+                        .saveAll(List.of(AnimeCreator.createAnimeToBeSaved(), AnimeCreator.createAnimeToBeSaved())))
+                .thenReturn(Flux.just(anime, anime));
 
         BDDMockito.when(animeRepositoryMock.delete(ArgumentMatchers.any(Anime.class)))
                 .thenReturn(Mono.empty());
@@ -98,7 +104,7 @@ class AnimeServiceTest {
 
     @Test
     @DisplayName("save creates an anime when successful")
-    public void save_CreateAnime_WhenSuccessful() {
+    public void save_CreatesAnime_WhenSuccessful() {
         Anime animeToBeSaved = AnimeCreator.createAnimeToBeSaved();
 
         StepVerifier.create(animeService.save(animeToBeSaved))
@@ -108,8 +114,34 @@ class AnimeServiceTest {
     }
 
     @Test
+    @DisplayName("saveAll creates a list of anime when successful")
+    public void saveAll_CreatesListOfAnime_WhenSuccessful() {
+        Anime animeToBeSaved = AnimeCreator.createAnimeToBeSaved();
+
+        StepVerifier.create(animeService.saveAll(List.of(animeToBeSaved, animeToBeSaved)))
+                .expectSubscription()
+                .expectNext(anime, anime)
+                .verifyComplete();
+    }
+
+    @Test
+    @DisplayName("saveAll returns Mono error when one of the objects in the list contains null or empty name")
+    public void saveAll_ReturnsMonoError_WhenContainsInvalidName() {
+        Anime animeToBeSaved = AnimeCreator.createAnimeToBeSaved();
+        Anime invalidAnime = animeToBeSaved.withName("");
+
+        BDDMockito.when(animeRepositoryMock.saveAll(ArgumentMatchers.anyIterable()))
+                .thenReturn(Flux.just(animeToBeSaved, invalidAnime));
+
+        StepVerifier.create(animeService.saveAll(List.of(animeToBeSaved, invalidAnime)))
+                .expectSubscription()
+                .expectError(ResponseStatusException.class)
+                .verify();
+    }
+
+    @Test
     @DisplayName("delete removes the anime when successful")
-    public void delete_RemoveAnime_WhenSuccessful() {
+    public void delete_RemovesAnime_WhenSuccessful() {
         StepVerifier.create(animeService.delete(1))
                 .expectSubscription()
                 .verifyComplete();
