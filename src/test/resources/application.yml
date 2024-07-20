@@ -1,21 +1,10 @@
 spring:
   r2dbc:
-    url: r2dbc:h2:mem:///anime
-    username: sa
+    url: r2dbc:postgresql://localhost:5432/postgres?schema=anime
+    username: root
     password: root
-    generate-unique-name: true
-
-  datasource:
-    url: jdbc:h2:mem:anime
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: root
-  sql:
-    init:
-      mode: always
-
 
 logging:
   level:
     org:
-      springframework: INFO # It does not work, since test application.yml is loaded after tests
+      springframework: INFO

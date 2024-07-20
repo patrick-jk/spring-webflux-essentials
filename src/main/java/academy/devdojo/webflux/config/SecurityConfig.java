@@ -24,6 +24,8 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
                         .pathMatchers(HttpMethod.POST, "/animes/**").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.PUT, "/animes/**").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.DELETE, "/animes/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.GET, "/animes/**").hasRole("USER")
                         .anyExchange().authenticated()
                 )

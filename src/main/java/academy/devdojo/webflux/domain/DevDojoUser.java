@@ -1,6 +1,7 @@
 package academy.devdojo.webflux.domain;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -14,6 +15,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table("devdojo_user")
