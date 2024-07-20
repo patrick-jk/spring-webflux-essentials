@@ -1,8 +1,6 @@
 spring:
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/postgres?schema=anime
-    username: root
-    password: root
+    url: r2dbc:tc:postgresql:///postgres?schema=anime&TC_IMAGE_TAG=latest
 
 logging:
   level:

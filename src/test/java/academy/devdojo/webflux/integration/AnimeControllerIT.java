@@ -1,8 +1,10 @@
 package academy.devdojo.webflux.integration;
 
+import academy.devdojo.webflux.config.TestContainers;
 import academy.devdojo.webflux.domain.Anime;
 import academy.devdojo.webflux.repository.AnimeRepository;
 import academy.devdojo.webflux.util.AnimeCreator;
+import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -27,12 +29,13 @@ import java.util.List;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+@Log4j2
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-public class AnimeControllerIT {
+public class AnimeControllerIT extends TestContainers {
     private final static String REGULAR_USER = "test-user";
-    private final static String ADMIN_USER = "patrick";
+    private final static String ADMIN_USER = "admin-user";
 
     @Autowired
     private WebTestClient client;
@@ -67,14 +70,13 @@ public class AnimeControllerIT {
 
         BDDMockito.when(animeRepositoryMock.save(AnimeCreator.createValidAnime()))
                 .thenReturn(Mono.empty());
-
     }
 
     @Test
     public void blockHoundWorks() {
         try {
             FutureTask<?> task = new FutureTask<>(() -> {
-                Thread.sleep(0); //NOSONAR
+                Thread.sleep(0);
                 return "";
             });
             Schedulers.parallel().schedule(task);
